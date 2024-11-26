@@ -35,7 +35,7 @@ export class AuthService {
             password: hashedPassword
         });
         const token = this.jwtService.sign({ id: user._id }  ) ;
-        return {token, message: 'Inscription réussie'}
+        return {token}
 
   }
 
