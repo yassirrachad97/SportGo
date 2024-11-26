@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api');
   app.enableCors({
     origin: ['http://localhost:5173'], 
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
@@ -16,7 +17,10 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
-  await app.listen(process.env.PORT ?? 3000);
+  const PORT = process.env.PORT || 3000; 
+  await app.listen(PORT, () => {
+    console.log(`server running dans on ${PORT}`);
+  });
 }
 bootstrap();
 

@@ -19,7 +19,7 @@ export class AuthService {
 
   async signUp(signUpDto: SignUpDto): Promise<{ token: string}>{
 
-    try{
+   
         const {username, email, password} = signUpDto;
         const existingUser = await this.userModel.findOne({ email });
         if (existingUser) {
@@ -33,13 +33,10 @@ export class AuthService {
         });
         const token = this.jwtService.sign({ id: user._id }  ) ;
         return {token}
-    }catch (error){
-        throw new Error(`Error signing up: ${error.message}`);
 
-    } 
   }
 
-  async login(loginDto: LoginDto): Promise<{ token: string}>{
+  async login(loginDto: LoginDto): Promise<{ token: string, user: { id: string; username: string }}>{
   
         const { email, password} = loginDto;
         const user = await this.userModel.findOne({email});
@@ -52,7 +49,13 @@ export class AuthService {
             throw new UnauthorizedException('invalide password!')
         }
         const token = this.jwtService.sign({ id: user._id } ) ;
-        return {token}
+        
+        
+        return {token,   user: {
+            id: user._id.toString(),
+            username: user.username,
+          },
+        };
   
   }
 }
