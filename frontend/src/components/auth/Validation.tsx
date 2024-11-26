@@ -6,8 +6,10 @@ export const validateEmail = (email: string): boolean => {
 
 
 export const validatePassword = (password: string): boolean => {
-    return password.length >= 6;
+    const regex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/;
+    return password.length >= 8 && regex.test(password);
 };
+
 
 
 export const validateUsername = (username: string): boolean => {

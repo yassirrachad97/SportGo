@@ -17,9 +17,10 @@ interface FormProps {
   inputs: InputFieldProps[];
   title: string;
   children?: ReactNode;
+  loading?: boolean;
 }
 
-const Form: FC<FormProps> = ({ onSubmit, inputs, title, children }) => {
+const Form: FC<FormProps> = ({ onSubmit, inputs, title, children, loading = false  }) => {
   return (
     <form onSubmit={onSubmit}>
       <h1>{title}</h1>
@@ -35,7 +36,7 @@ const Form: FC<FormProps> = ({ onSubmit, inputs, title, children }) => {
         />
       ))}
       {children}
-      <Button text={inputs.find(input => input.submitText)?.submitText || "Envoyer"} />
+      <Button text={loading ? "Loading..." : "Envoyer"} disabled={loading} />
     </form>
   );
 };
