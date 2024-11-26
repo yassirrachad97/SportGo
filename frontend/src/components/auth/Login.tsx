@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { MdEmail } from 'react-icons/md';
 import { FaLock } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { validateEmail, validatePassword } from './Validation';
 import Form from './Form';
 import '../style/auth.css';
@@ -10,11 +10,13 @@ import { toast } from 'react-toastify';
 
 
 
-const Login: React.FC = () => {
+const Login: React.FC = () => { 
+const navigate = useNavigate();
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [emailError, setEmailError] = useState<string>('');
   const [passwordError, setPasswordError] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
   const [token, setToken] = useState<string | null>(null); 
 
 
@@ -27,7 +29,7 @@ const Login: React.FC = () => {
       }
     } else if (type === 'password') {
       if (!validatePassword(password)) {
-        setPasswordError('Le mot de passe doit comporter au moins 6 caractères.');
+        setPasswordError('Le mot de passe doit comporter au moins 8 caractères.');
       } else {
         setPasswordError('');
       }
@@ -36,6 +38,7 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     let valid = true;
 
     if (!validateEmail(email)) {
@@ -46,8 +49,14 @@ const Login: React.FC = () => {
     }
 
     if (!validatePassword(password)) {
-      setPasswordError('Le mot de passe doit comporter au moins 6 caractères.');
-      valid = false;
+          
+        if (password.length < 8) {
+            setPasswordError('Le mot de passe doit comporter au moins 8 caractères.');
+        } else {
+            
+            setPasswordError('Le mot de passe doit contenir au moins un chiffre, une majuscule et une minuscule.');
+        }
+        valid = false;
     } else {
       setPasswordError('');
     }
@@ -63,8 +72,10 @@ const Login: React.FC = () => {
 
       
         if (data.token) {
-          setToken(data.token); 
+         localStorage.setItem('token', data.token);
+         setToken(data.token); 
           toast.success('Connexion réussie!');
+          navigate('/dashboard'); 
         } else {
           toast.error('Token manquant dans la réponse.');
         }
@@ -76,6 +87,7 @@ const Login: React.FC = () => {
         }
       }
     }
+    setLoading(false);
   };
 
   const inputs = [
@@ -102,8 +114,8 @@ const Login: React.FC = () => {
   return (
     <div className="wrapper login-page">
       <div className="form-box login">
-        <Form onSubmit={handleSubmit} inputs={inputs} title="Login">
-          {/* No additional children */}
+        <Form onSubmit={handleSubmit} inputs={inputs} title="Login" loading={loading}>
+      
         </Form>
 
         <div className="register-link">
