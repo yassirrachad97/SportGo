@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsString, IsNotEmpty, IsDate, IsPositive, Min, MinDate } from 'class-validator';
+import { IsString, IsNotEmpty, IsDate, IsPositive, Min, MinDate, IsOptional, IsInt } from 'class-validator';
 
 export class CreateEventDto {
   @IsString()
@@ -20,7 +20,13 @@ export class CreateEventDto {
   @Type(() => Date) 
   date: Date;
 
-  @IsPositive()
+  @IsInt({ message: 'La capacité doit être un entier.' })
+  @IsPositive({ message: 'La capacité doit être un nombre positif.' })
   @Min(1, { message: 'The capacity must be at least 1.' })
-  capacity: number; 
+  @Type(() => Number)
+  capacity: number;
+  
+  @IsString()
+  @IsOptional()
+  image?: string;
 }
