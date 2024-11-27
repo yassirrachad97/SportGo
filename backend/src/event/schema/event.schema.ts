@@ -25,8 +25,6 @@ export class Event extends Document{
   organizerId: Types.ObjectId;
 
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: 'List' }] }) 
-  lists: Types.ObjectId[];
 
 }
 

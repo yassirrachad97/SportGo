@@ -18,4 +18,6 @@ export class EventService {
         return await newEvent.save();
 
     }
+
+    
 }
