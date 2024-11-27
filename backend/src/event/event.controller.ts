@@ -31,7 +31,7 @@ export class EventController {
 
     @Patch(':id')
 
-    async modifierEvent(@Param('id') eventId: string, 
+    async modifiérEvent(@Param('id') eventId: string, 
     @Req() req: any, 
     @Body() updateEventDto: UpdateEventDto,
 ){
