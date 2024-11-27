@@ -17,6 +17,7 @@ const Register: React.FC = () => {
     const [username, setUsername] = useState<string>('');
     const [email, setEmail] = useState<string>('');
     const [password, setPassword] = useState<string>('');
+    const [loading, setLoading] = useState(false);
    
 
    
@@ -28,7 +29,7 @@ const Register: React.FC = () => {
   
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+        setLoading(true);
         let valid = true;
 
        
@@ -49,9 +50,14 @@ const Register: React.FC = () => {
             setEmailError('');
         }
 
-    
         if (!validatePassword(password)) {
-            setPasswordError('Le mot de passe doit comporter au moins 6 caractères.');
+          
+            if (password.length < 8) {
+                setPasswordError('Le mot de passe doit comporter au moins 8 caractères.');
+            } else {
+                
+                setPasswordError('Le mot de passe doit contenir au moins un chiffre, une majuscule et une minuscule.');
+            }
             valid = false;
         } else {
             setPasswordError('');
@@ -60,7 +66,7 @@ const Register: React.FC = () => {
         
         if (valid) {
             try {
-                const response = await axios.post('http://localhost:3000/api/auth/register', {
+                const response = await axios.post('http://localhost:3000/api/auth/signup', {
                     username,
                     email,
                     password,
@@ -72,20 +78,23 @@ const Register: React.FC = () => {
                 setUsername('');
                 setEmail('');
                 setPassword('');
-               
+                navigate('/login');
 
              
-                navigate('/login');
+          
             } catch (error: any) {
-                if (error.response && error.response.data) {
-                  
-                    toast.error(error.response.data.message || 'Une erreur s\'est produite.');
+                
+                if (axios.isAxiosError(error)) {
+                    
+                    const errorMessage = error.response?.data?.message || 'Une erreur s\'est produite.';
+                    toast.error(errorMessage);
                 } else {
-                  
-                    toast.error('Erreur de connexion au serveur.');
+                    toast.error('Erreur inconnue.');
                 }
             }
         }
+        setLoading(false);
+     
     };
 
   
@@ -120,7 +129,8 @@ const Register: React.FC = () => {
     return (
         <div className="wrapper register-page">
             <div className="form-box register">
-                <Form onSubmit={handleSubmit} inputs={inputs} title="Register" />
+                <Form onSubmit={handleSubmit} inputs={inputs} title="Register" loading={loading}/>
+                
                 <div className="register-link">
                     <p>
                         Already have an account? <Link to="/login">Login</Link>
