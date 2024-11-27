@@ -1,9 +1,10 @@
-import { Body, Controller, Param, Patch, Post, Req, Request, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Param, Patch, Post, Req, Request, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { EventService } from './event.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+
 
 
 @Controller('event')
@@ -17,11 +18,13 @@ export class EventController {
  
     @Post('/create')
     @UseInterceptors(FileInterceptor('image'))
-    async createEvenement(@Body() createEventDto: CreateEventDto,
+    async createEvenement(
+   
+     @Body() createEventDto: CreateEventDto,
      @UploadedFile() file: Express.Multer.File,
      @Request() req) {
         const organizerId = req.user.id;
-      
+     
   
         return this.eventService.createEvent(createEventDto, organizerId, file);
     }
@@ -34,6 +37,13 @@ export class EventController {
 ){
     const organizerId = req.user.id;
     return await this.eventService.updateEvent(eventId, organizerId, updateEventDto);
+    }
+
+
+    @Delete('id')
+    async suppriméEvent(@Param('id') eventId: string, @Request() req) {
+      const organizerId = req.user.id; 
+      return this.eventService.deleteEvent(eventId, organizerId);
     }
 
 }

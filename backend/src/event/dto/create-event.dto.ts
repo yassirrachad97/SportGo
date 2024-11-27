@@ -23,6 +23,7 @@ export class CreateEventDto {
   @IsInt({ message: 'La capacité doit être un entier.' })
   @IsPositive({ message: 'La capacité doit être un nombre positif.' })
   @Min(1, { message: 'The capacity must be at least 1.' })
+  @Type(() => Number)
   capacity: number;
   
   @IsString()

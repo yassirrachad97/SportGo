@@ -15,7 +15,9 @@ export class EventService {
 
     async createEvent(createEventDto: CreateEventDto, 
         organizerId: string,
-          file?: Express.Multer.File,): Promise<Event>{
+          file?: Express.Multer.File,
+         
+        ): Promise<Event>{
 
             let imageUrl: string;
 
@@ -30,6 +32,7 @@ export class EventService {
             ...createEventDto,
             organizerId,
             image: imageUrl,
+           
         });
         return await newEvent.save();
 
@@ -60,5 +63,19 @@ export class EventService {
         return updateEvent;
     }
 
+    async deleteEvent(eventId: string, organizerId: string): Promise<{ message: string }> {
+        const event = await this.eventModel.findById(eventId);
     
+        if (!event) {
+          throw new NotFoundException(`Événement avec l'ID ${eventId} introuvable.`);
+        }
+    
+        if (event.organizerId.toString() !== organizerId) {
+          throw new NotFoundException(`Vous n'avez pas l'autorisation de supprimer cet événement.`);
+        }
+    
+        await this.eventModel.findByIdAndDelete(eventId);
+    
+        return { message: `L'événement avec l'ID ${eventId} a été supprimé avec succès.` };
+      }
 }
