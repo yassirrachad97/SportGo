@@ -40,8 +40,8 @@ export class EventController {
     }
 
 
-    @Delete('id')
-    async suppriméEvent(@Param('id') eventId: string, @Request() req) {
+    @Delete('delete/:id')
+    async supprimerEvent(@Param('id') eventId: string, @Request() req) {
       const organizerId = req.user.id; 
       return this.eventService.deleteEvent(eventId, organizerId);
     }
