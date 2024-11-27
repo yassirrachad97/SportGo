@@ -45,6 +45,10 @@ export class EventController {
       const organizerId = req.user.id; 
       return this.eventService.deleteEvent(eventId, organizerId);
     }
-
+    @Get('organizer')
+    async getEventsByOrganizer(@Request() req) {
+        const organizerId = req.user.id;
+        return await this.eventService.getEventsByOrganizer(organizerId);
+      }
    
 }
