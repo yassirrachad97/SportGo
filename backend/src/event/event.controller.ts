@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Param, Patch, Post, Req, Request, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, Request, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { EventService } from './event.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -31,7 +31,7 @@ export class EventController {
 
     @Patch(':id')
 
-    async modifiérEvent(@Param('id') eventId: string, 
+    async modifierEvent(@Param('id') eventId: string, 
     @Req() req: any, 
     @Body() updateEventDto: UpdateEventDto,
 ){
@@ -40,10 +40,11 @@ export class EventController {
     }
 
 
-    @Delete('id')
-    async suppriméEvent(@Param('id') eventId: string, @Request() req) {
+    @Delete('delete/:id')
+    async supprimerEvent(@Param('id') eventId: string, @Request() req) {
       const organizerId = req.user.id; 
       return this.eventService.deleteEvent(eventId, organizerId);
     }
 
+   
 }

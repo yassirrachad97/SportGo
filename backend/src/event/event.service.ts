@@ -78,4 +78,6 @@ export class EventService {
     
         return { message: `L'événement avec l'ID ${eventId} a été supprimé avec succès.` };
       }
+
+    
 }
