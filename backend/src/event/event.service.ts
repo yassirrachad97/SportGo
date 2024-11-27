@@ -78,4 +78,9 @@ export class EventService {
     
         return { message: `L'événement avec l'ID ${eventId} a été supprimé avec succès.` };
       }
+
+      async getEventsByOrganizer(organizerId: string): Promise<Event[]> {
+        return await this.eventModel.find({ organizerId }).exec();
+      }
+    
 }
