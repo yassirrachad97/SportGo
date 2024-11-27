@@ -20,7 +20,10 @@ export class Event extends Document{
   @Prop({ required: true, min: 1 })
   capacity: number;
 
-  
+  @Prop({ type: String, required: false }) 
+  image?: string; 
+
+
   @Prop({ type: Types.ObjectId, ref: 'User', required: true }) 
   organizerId: Types.ObjectId;
 
