@@ -17,7 +17,6 @@ const navigate = useNavigate();
   const [emailError, setEmailError] = useState<string>('');
   const [passwordError, setPasswordError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  const [token, setToken] = useState<string | null>(null); 
 
 
   const handleBlur = (type: 'email' | 'password') => {
@@ -73,12 +72,16 @@ const navigate = useNavigate();
       
         if (data.token) {
          localStorage.setItem('token', data.token);
-         setToken(data.token); 
+         if (data.user && data.user.role === 'organisateur') {
           toast.success('Connexion réussie!');
-          navigate('/dashboard'); 
+          navigate('/dashboard');
         } else {
-          toast.error('Token manquant dans la réponse.');
+          toast.error('Vous n’êtes pas autorisé à accéder à cette page.');
+          navigate('/access-denied'); 
         }
+      } else {
+        toast.error('Token manquant dans la réponse.');
+      }
       } catch (error: any) {
         if (error.response && error.response.data) {
           toast.error(error.response.data.message || 'Erreur lors de la connexion.');
@@ -112,6 +115,7 @@ const navigate = useNavigate();
   ];
 
   return (
+    <div className="auth-background">
     <div className="wrapper login-page">
       <div className="form-box login">
         <Form onSubmit={handleSubmit} inputs={inputs} title="Login" loading={loading}>
@@ -124,6 +128,7 @@ const navigate = useNavigate();
           </p>
         </div>
       </div>
+    </div>
     </div>
   );
 };
