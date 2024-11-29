@@ -5,20 +5,33 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
-import DashboardLayout from './Dashbord';
-// import DashboardLayout from './components/layout/DashboardLayout'; // Correct import for DashboardLayout
+import DashboardLayout from './components/dashboard/DashboardLayout';
+import AuthGuard from './components/layout/AuthGuard';
+import {Events} from './components/dashboard/Events';
+import Participants from './components/dashboard/Participants';
+
+
+
 
 const App: React.FC = () => {
   return (
     <Router>
       <ToastContainer />
       <Routes>
-        {/* Public Routes */}
+      
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* Protected Dashboard Routes */}
-        <Route path="/*" element={<DashboardLayout />} />
+        {/* <Route element={<AuthGuard />}> */}
+        <Route path="/dashboard" element={<DashboardLayout />}>
+        <Route path="events" element={<Events />} />
+        <Route path="participants" element={<Participants />} />
+       
+           
+
+        {/* </Route> */}
+        </Route>
+
       </Routes>
     </Router>
   );

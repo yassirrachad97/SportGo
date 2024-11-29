@@ -71,17 +71,15 @@ const navigate = useNavigate();
 
       
         if (data.token) {
-         localStorage.setItem('token', data.token);
-         if (data.user && data.user.role === 'organisateur') {
+          console.log("Token reçu:", data.token);
+          localStorage.setItem('token', data.token);
+          console.log("Token sauvegardé dans localStorage:", localStorage.getItem('token'));
+  
           toast.success('Connexion réussie!');
           navigate('/dashboard');
         } else {
-          toast.error('Vous n’êtes pas autorisé à accéder à cette page.');
-          navigate('/access-denied'); 
+          toast.error('Token manquant dans la réponse.');
         }
-      } else {
-        toast.error('Token manquant dans la réponse.');
-      }
       } catch (error: any) {
         if (error.response && error.response.data) {
           toast.error(error.response.data.message || 'Erreur lors de la connexion.');
