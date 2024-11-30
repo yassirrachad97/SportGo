@@ -17,7 +17,6 @@ const navigate = useNavigate();
   const [emailError, setEmailError] = useState<string>('');
   const [passwordError, setPasswordError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  const [token, setToken] = useState<string | null>(null); 
 
 
   const handleBlur = (type: 'email' | 'password') => {
@@ -72,10 +71,12 @@ const navigate = useNavigate();
 
       
         if (data.token) {
-         localStorage.setItem('token', data.token);
-         setToken(data.token); 
+          console.log("Token reçu:", data.token);
+          localStorage.setItem('token', data.token);
+          console.log("Token sauvegardé dans localStorage:", localStorage.getItem('token'));
+  
           toast.success('Connexion réussie!');
-          navigate('/dashboard'); 
+          navigate('/dashboard');
         } else {
           toast.error('Token manquant dans la réponse.');
         }
@@ -112,6 +113,7 @@ const navigate = useNavigate();
   ];
 
   return (
+    <div className="auth-background">
     <div className="wrapper login-page">
       <div className="form-box login">
         <Form onSubmit={handleSubmit} inputs={inputs} title="Login" loading={loading}>
@@ -124,6 +126,7 @@ const navigate = useNavigate();
           </p>
         </div>
       </div>
+    </div>
     </div>
   );
 };

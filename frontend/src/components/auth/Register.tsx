@@ -127,6 +127,7 @@ const Register: React.FC = () => {
     ];
 
     return (
+        <div className="auth-background">
         <div className="wrapper register-page">
             <div className="form-box register">
                 <Form onSubmit={handleSubmit} inputs={inputs} title="Register" loading={loading}/>
@@ -137,6 +138,7 @@ const Register: React.FC = () => {
                     </p>
                 </div>
             </div>
+        </div>
         </div>
     );
 };
