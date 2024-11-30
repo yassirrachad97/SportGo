@@ -1,5 +1,5 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
-import { Model } from 'mongoose';
+import { Injectable, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
+import mongoose, { Model } from 'mongoose';
 import { Participant } from './schema/participant.schema';
 import { Event } from 'src/event/schema/event.schema';
 import { InjectModel } from '@nestjs/mongoose';
@@ -100,4 +100,35 @@ export class ParticipantsService {
       participant,
     };
   }
+
+
+  async getParticipantsForEvent(eventId: string, userId: string): Promise<any> {
+    console.log('Received User ID:', userId);  
+
+    if (!eventId || !mongoose.Types.ObjectId.isValid(eventId)) {
+        throw new NotFoundException(`L'ID de l'événement ${eventId} est invalide.`);
+      }
+    
+    const event = await this.eventModel.findById(eventId);
+    if (!event) {
+      throw new NotFoundException(`Event with ID ${eventId} not found.`);
+    }
+
+    if (event.organizerId.toString() !== userId) {
+      throw new ForbiddenException('You are not the organizer of this event.');
+    }
+
+    const participants = await this.participantModel.find({ eventId }).populate('eventId');
+    
+    if (participants.length === 0) {
+      return { message: 'No participants found for this event.' };
+    }
+
+    return {
+      participants,
+      totalParticipants: participants.length,
+    };
+}
+
+
 }
