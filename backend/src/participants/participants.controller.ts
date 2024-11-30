@@ -1,9 +1,11 @@
-import { Body, Controller, Delete, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Request, UseGuards } from '@nestjs/common';
 import { ParticipantsService } from './participants.service';
 import { CreateParticipantDto } from './dto/create-participant.dto';
 import { UpdateParticipantDto } from './dto/Update-ParticipantDto';
+import { AuthGuard } from 'src/auth/auth.guard';
 
 @Controller('participants')
+@UseGuards(AuthGuard)
 export class ParticipantsController {
   constructor(private readonly participantsService: ParticipantsService) {}
 
@@ -26,6 +28,18 @@ export class ParticipantsController {
     @Param('eventId') eventId: string,
   ) {
     return this.participantsService.removeParticipant(participantId, eventId);
+  }
+
+
+  @Get('event/:eventId')
+ 
+  async getParticipants(
+    @Param('eventId') eventId: string,
+    @Request() req, 
+  ): Promise<any> {
+    console.log('User ID from request:', req.user?.id);  
+
+    return this.participantsService.getParticipantsForEvent(eventId, req.user?.id);  
   }
   
 }
