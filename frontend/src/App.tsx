@@ -22,14 +22,14 @@ const App: React.FC = () => {
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* <Route element={<AuthGuard />}> */}
+        <Route element={<AuthGuard />}>
         <Route path="/dashboard" element={<DashboardLayout />}>
         <Route path="events" element={<Events />} />
         <Route path="participants" element={<Participants />} />
        
            
 
-        {/* </Route> */}
+        </Route>
         </Route>
 
       </Routes>
