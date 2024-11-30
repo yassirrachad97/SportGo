@@ -6,6 +6,8 @@ import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { EventModule } from './event/event.module';
+import { ParticipantsModule } from './participants/participants.module';
+
 
 
 @Module({
@@ -15,7 +17,9 @@ import { EventModule } from './event/event.module';
     }),
     DatabaseModule,
     AuthModule,
-    EventModule
+    EventModule,
+    ParticipantsModule,
+
   ],
   controllers: [AppController],
   providers: [AppService],
