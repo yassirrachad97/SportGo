@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Param, Post, Put } from '@nestjs/common';
 import { ParticipantsService } from './participants.service';
 import { CreateParticipantDto } from './dto/create-participant.dto';
 import { UpdateParticipantDto } from './dto/Update-ParticipantDto';
@@ -12,11 +12,20 @@ export class ParticipantsController {
     return await this.participantsService.registerParticipant(createParticipantdto);
   }
 
-  @Put(':id')
+  @Put('update/:id')
   async ModifierParticipant(
     @Param('id') participantId: string,
     @Body() updateParticipantDto: UpdateParticipantDto,
   ): Promise<any> {
     return this.participantsService.updateParticipant(participantId, updateParticipantDto);
   }
+
+  @Delete(':participantId/:eventId')
+  async removeParticipant(
+    @Param('participantId') participantId: string,
+    @Param('eventId') eventId: string,
+  ) {
+    return this.participantsService.removeParticipant(participantId, eventId);
+  }
+  
 }

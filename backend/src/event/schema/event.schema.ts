@@ -20,6 +20,11 @@ export class Event extends Document{
   @Prop({ required: true, min: 1 })
   capacity: number;
 
+
+  @Prop({ default: function () { return this.capacity; } })
+  availableSeats: number;
+
+
   @Prop({ type: String, required: false }) 
   image?: string; 
 
@@ -32,3 +37,10 @@ export class Event extends Document{
 }
 
 export const EventSchema = SchemaFactory.createForClass(Event);
+
+EventSchema.pre('save', function (next) {
+  if (this.isNew && !this.availableSeats) {
+    this.availableSeats = this.capacity;
+  }
+  next();
+});

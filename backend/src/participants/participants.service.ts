@@ -1,30 +1,48 @@
 import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { Participant } from './schema/participant.schema';
+import { Event } from 'src/event/schema/event.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateParticipantDto } from './dto/create-participant.dto';
 import { UpdateParticipantDto } from './dto/Update-ParticipantDto';
 
 @Injectable()
 export class ParticipantsService {
-  constructor(@InjectModel(Participant.name) private participantModel: Model<Participant>) {}
+  constructor(@InjectModel(Participant.name) private participantModel: Model<Participant>,
+  @InjectModel(Event.name) private eventModel: Model<Event>,) {}
 
   async registerParticipant(createParticipantDto: CreateParticipantDto): Promise<any> {
     const { email, eventId } = createParticipantDto;
+  
     const existingParticipant = await this.participantModel.findOne({ email, eventId });
     if (existingParticipant) {
       throw new BadRequestException(`Participant with email ${email} is already registered for this event.`);
     }
+  
+    const event = await this.eventModel.findById(eventId).exec();
+    if (!event) {
+      throw new NotFoundException(`Event with ID ${eventId} not found.`);
+    }
+
+    if (event.availableSeats <= 0) {
+      throw new BadRequestException('No available seats for this event.');
+    }
+  
+  
+    event.availableSeats -= 1;
+    await event.save();
+  
+  
     try {
       const newParticipant = new this.participantModel(createParticipantDto);
       await newParticipant.save();
-
+  
       return {
         message: 'Participant registered successfully.',
         participant: newParticipant,
       };
     } catch (error) {
-        console.error('Error while registering participant:', error);
+      console.error('Error while registering participant:', error);
       throw new BadRequestException('An error occurred while registering the participant.');
     }
   }
@@ -57,6 +75,29 @@ export class ParticipantsService {
     return {
       message: 'Participant updated successfully.',
       participant: participant,
+    };
+  }
+
+  async removeParticipant(participantId: string, eventId: string): Promise<any> {
+    const participant = await this.participantModel.findOneAndDelete({ _id: participantId, eventId });
+    if (!participant) {
+      throw new NotFoundException(`Participant not found in event with ID ${eventId}.`);
+    }
+
+   
+    const updatedEvent = await this.eventModel.findByIdAndUpdate(
+      eventId,
+      { $inc: { availableSeats: 1 } },
+      { new: true },
+    );
+
+    if (!updatedEvent) {
+      throw new BadRequestException(`Failed to update event with ID ${eventId}.`);
+    }
+
+    return {
+      message: 'Participant removed successfully, seat freed.',
+      participant,
     };
   }
 }
