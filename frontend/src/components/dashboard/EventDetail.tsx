@@ -20,7 +20,7 @@ interface EventDetail {
 
 const EventDetail: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
-  console.log("Event ID from URL:", eventId);
+
   const navigate = useNavigate();
   const [eventDetail, setEventDetail] = useState<EventDetail | null>(null);
   const [participants, setParticipants] = useState<Participant[]>([]);
@@ -67,7 +67,7 @@ const EventDetail: React.FC = () => {
   };
 
   const handleDeleteParticipant = async (participantId: string, eventId: string) => {
-    console.log("Deleting participant from event with ID:", eventId);
+  
     if (!eventId) {
       toast.error("Event ID is missing.");
       console.log("Event ID is missing.");
