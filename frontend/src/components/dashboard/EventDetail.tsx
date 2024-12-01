@@ -16,6 +16,7 @@ interface EventDetail {
   location: string;
   date: string;
   capacity: number;
+
 }
 
 const EventDetail: React.FC = () => {
@@ -106,6 +107,7 @@ const EventDetail: React.FC = () => {
   };
 
   const handleAddParticipant = async (e: React.FormEvent) => {
+   
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
