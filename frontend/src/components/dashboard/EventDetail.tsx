@@ -20,13 +20,19 @@ interface EventDetail {
 
 const EventDetail: React.FC = () => {
   const { eventId } = useParams<{ eventId: string }>();
-
   const navigate = useNavigate();
+  
   const [eventDetail, setEventDetail] = useState<EventDetail | null>(null);
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
+  const [newParticipant, setNewParticipant] = useState<Participant>({
+    _id: "",
+    name: "",
+    email: "",
+    phone: "",
+  });
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const participantsPerPage = 10;
@@ -67,20 +73,19 @@ const EventDetail: React.FC = () => {
   };
 
   const handleDeleteParticipant = async (participantId: string, eventId: string) => {
-  
     if (!eventId) {
       toast.error("Event ID is missing.");
       console.log("Event ID is missing.");
       return;
     }
-  
+
     try {
       const token = localStorage.getItem("token");
       if (!token) {
         toast.error("Token not found.");
         return;
       }
-  
+
       const response = await axios.delete(
         `http://localhost:3000/api/participants/${participantId}/${eventId}`,
         {
@@ -89,7 +94,7 @@ const EventDetail: React.FC = () => {
           },
         }
       );
-  
+
       toast.success("Participant deleted successfully.");
       setParticipants((prevParticipants) =>
         prevParticipants.filter((participant) => participant._id !== participantId)
@@ -99,10 +104,40 @@ const EventDetail: React.FC = () => {
       console.error("Error deleting participant:", error);
     }
   };
-  
-  
-  
 
+  const handleAddParticipant = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Token not found.");
+        return;
+      }
+
+      const response = await axios.post(
+        `http://localhost:3000/api/participants/register`,
+        {
+          name: newParticipant.name,
+          email: newParticipant.email,
+          phone: newParticipant.phone,
+          eventId: eventId,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      toast.success("Participant added successfully.");
+      setParticipants((prevParticipants) => [...prevParticipants, response.data.participant]);
+      setNewParticipant({ _id: "", name: "", email: "", phone: "" });
+      setIsModalOpen(false);
+    } catch (error) {
+      toast.error(`Failed to add participant: ${error.response ? error.response.data.message : error.message}`);
+      console.error("Error adding participant:", error);
+    }
+  };
 
   const indexOfLastParticipant = currentPage * participantsPerPage;
   const indexOfFirstParticipant = indexOfLastParticipant - participantsPerPage;
@@ -137,14 +172,83 @@ const EventDetail: React.FC = () => {
         <strong>Location:</strong> {eventDetail.location}
       </p>
       <p>
-        <strong>Date:</strong>{" "}
-        {new Date(eventDetail.date).toLocaleString()}
+        <strong>Date:</strong> {new Date(eventDetail.date).toLocaleString()}
       </p>
       <p>
         <strong>Capacity:</strong> {eventDetail.capacity}
       </p>
 
       <h3 className="text-xl mt-6 mb-2">Participants</h3>
+      
+    
+      <button
+        onClick={() => setIsModalOpen(true)}
+        className="bg-green-500 text-white p-2 rounded mb-4"
+      >
+        Add Participant
+      </button>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 flex justify-center items-center bg-gray-600 bg-opacity-50">
+          <div className="bg-white p-6 rounded shadow-lg w-96">
+            <h3 className="text-xl font-semibold mb-4">Add Participant</h3>
+            <form onSubmit={handleAddParticipant}>
+              <div className="mb-4">
+                <label htmlFor="name" className="block">Name</label>
+                <input
+                  type="text"
+                  id="name"
+                  placeholder="Name"
+                  value={newParticipant.name}
+                  onChange={(e) => setNewParticipant({ ...newParticipant, name: e.target.value })}
+                  className="border p-2 w-full"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label htmlFor="email" className="block">Email</label>
+                <input
+                  type="email"
+                  id="email"
+                  placeholder="Email"
+                  value={newParticipant.email}
+                  onChange={(e) => setNewParticipant({ ...newParticipant, email: e.target.value })}
+                  className="border p-2 w-full"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label htmlFor="phone" className="block">Phone</label>
+                <input
+                  type="text"
+                  id="phone"
+                  placeholder="Phone"
+                  value={newParticipant.phone}
+                  onChange={(e) => setNewParticipant({ ...newParticipant, phone: e.target.value })}
+                  className="border p-2 w-full"
+                  required
+                />
+              </div>
+              <div className="flex justify-between">
+                <button
+                  type="submit"
+                  className="bg-blue-500 text-white px-4 py-2 rounded"
+                >
+                  Add
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(false)} 
+                  className="bg-gray-400 text-white px-4 py-2 rounded"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       <table className="min-w-full border-collapse border border-gray-300">
         <thead>
           <tr>
@@ -190,11 +294,7 @@ const EventDetail: React.FC = () => {
           <button
             key={index}
             onClick={() => handlePageChange(index + 1)}
-            className={`px-3 py-1 rounded ${
-              currentPage === index + 1
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200 text-gray-700"
-            }`}
+            className={`px-3 py-1 rounded ${currentPage === index + 1 ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"}`}
           >
             {index + 1}
           </button>
