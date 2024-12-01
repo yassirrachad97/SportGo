@@ -34,6 +34,8 @@ const EventDetail: React.FC = () => {
     phone: "",
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [participantToEdit, setParticipantToEdit] = useState<Participant | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const participantsPerPage = 10;
@@ -141,6 +143,46 @@ const EventDetail: React.FC = () => {
     }
   };
 
+  const handleEditParticipant = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!participantToEdit) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Token not found.");
+        return;
+      }
+
+      const response = await axios.put(
+        `http://localhost:3000/api/participants/update/${participantToEdit._id}`,
+        {
+          name: participantToEdit.name,
+          email: participantToEdit.email,
+          phone: participantToEdit.phone,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      toast.success("Participant updated successfully.");
+      setParticipants((prevParticipants) =>
+        prevParticipants.map((participant) =>
+          participant._id === participantToEdit._id ? response.data.participant : participant
+        )
+      );
+      setIsEditModalOpen(false);
+      setParticipantToEdit(null);
+    } catch (error) {
+      toast.error(`Failed to update participant: ${error.response ? error.response.data.message : error.message}`);
+      console.error("Error updating participant:", error);
+    }
+  };
+
+
   const indexOfLastParticipant = currentPage * participantsPerPage;
   const indexOfFirstParticipant = indexOfLastParticipant - participantsPerPage;
   const currentParticipants = participants.slice(
@@ -181,8 +223,7 @@ const EventDetail: React.FC = () => {
       </p>
 
       <h3 className="text-xl mt-6 mb-2">Participants</h3>
-      
-    
+
       <button
         onClick={() => setIsModalOpen(true)}
         className="bg-green-500 text-white p-2 rounded mb-4"
@@ -190,6 +231,7 @@ const EventDetail: React.FC = () => {
         Add Participant
       </button>
 
+      {/* Modal d'ajout de participant */}
       {isModalOpen && (
         <div className="fixed inset-0 flex justify-center items-center bg-gray-600 bg-opacity-50">
           <div className="bg-white p-6 rounded shadow-lg w-96">
@@ -251,6 +293,74 @@ const EventDetail: React.FC = () => {
         </div>
       )}
 
+      {/* Modal de modification de participant */}
+      {isEditModalOpen && participantToEdit && (
+        <div className="fixed inset-0 flex justify-center items-center bg-gray-600 bg-opacity-50">
+          <div className="bg-white p-6 rounded shadow-lg w-96">
+            <h3 className="text-xl font-semibold mb-4">Edit Participant</h3>
+            <form onSubmit={handleEditParticipant}>
+              <div className="mb-4">
+                <label htmlFor="name" className="block">Name</label>
+                <input
+                  type="text"
+                  id="name"
+                  placeholder="Name"
+                  value={participantToEdit.name}
+                  onChange={(e) =>
+                    setParticipantToEdit({ ...participantToEdit, name: e.target.value })
+                  }
+                  className="border p-2 w-full"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label htmlFor="email" className="block">Email</label>
+                <input
+                  type="email"
+                  id="email"
+                  placeholder="Email"
+                  value={participantToEdit.email}
+                  onChange={(e) =>
+                    setParticipantToEdit({ ...participantToEdit, email: e.target.value })
+                  }
+                  className="border p-2 w-full"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label htmlFor="phone" className="block">Phone</label>
+                <input
+                  type="text"
+                  id="phone"
+                  placeholder="Phone"
+                  value={participantToEdit.phone}
+                  onChange={(e) =>
+                    setParticipantToEdit({ ...participantToEdit, phone: e.target.value })
+                  }
+                  className="border p-2 w-full"
+                  required
+                />
+              </div>
+              <div className="flex justify-between">
+                <button
+                  type="submit"
+                  className="bg-blue-500 text-white px-4 py-2 rounded"
+                >
+                  Save Changes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(false)} 
+                  className="bg-gray-400 text-white px-4 py-2 rounded"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       <table className="min-w-full border-collapse border border-gray-300">
         <thead>
           <tr>
@@ -281,6 +391,15 @@ const EventDetail: React.FC = () => {
                         className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
                       >
                         Delete
+                      </button>
+                      <button
+                        onClick={() => {
+                          setParticipantToEdit(participant);
+                          setIsEditModalOpen(true);
+                        }}
+                        className="block w-full text-left px-4 py-2 text-blue-600 hover:bg-gray-100"
+                      >
+                        Edit
                       </button>
                     </div>
                   )}
