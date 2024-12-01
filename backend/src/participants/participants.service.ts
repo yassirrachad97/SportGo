@@ -1,10 +1,12 @@
-import { Injectable, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, ForbiddenException, Res } from '@nestjs/common';
 import mongoose, { Model } from 'mongoose';
 import { Participant } from './schema/participant.schema';
 import { Event } from 'src/event/schema/event.schema';
 import { InjectModel } from '@nestjs/mongoose';
+import { Response } from 'express';
 import { CreateParticipantDto } from './dto/create-participant.dto';
 import { UpdateParticipantDto } from './dto/Update-ParticipantDto';
+import jsPDF from 'jspdf';
 
 @Injectable()
 export class ParticipantsService {
@@ -131,4 +133,74 @@ export class ParticipantsService {
 }
 
 
+
+async generateParticipantsPdf(eventId: string, userId: string, response: Response): Promise<void> {
+    console.log('Generating PDF for event:', eventId);
+
+    if (!eventId || !mongoose.Types.ObjectId.isValid(eventId)) {
+      throw new NotFoundException(`L'ID de l'événement ${eventId} est invalide.`);
+    }
+
+    const event = await this.eventModel.findById(eventId);
+    if (!event) {
+      throw new NotFoundException(`Event with ID ${eventId} not found.`);
+    }
+
+    if (event.organizerId.toString() !== userId) {
+      throw new ForbiddenException('You are not the organizer of this event.');
+    }
+
+    const participants = await this.participantModel.find({ eventId });
+    if (participants.length === 0) {
+      throw new NotFoundException('No participants found for this event.');
+    }
+
+    const doc = new jsPDF();
+
+  
+    const participantsPerPage = 20;
+    const pageHeight = 297; 
+    const marginTop = 20;
+    const marginBottom = 20;
+    const lineSpacing = 10;
+    const maxLinesPerPage = Math.floor((pageHeight - marginTop - marginBottom) / lineSpacing);
+
+    let currentPage = 1;
+    let yPosition = marginTop;
+
+  
+    doc.setFontSize(16);
+    doc.text(`Participants List for Event: ${event.title}`, 10, yPosition);
+    yPosition += 10;
+
+    participants.forEach((participant, index) => {
+      if ((index % participantsPerPage === 0) && index !== 0) {
+       
+        doc.addPage();
+        currentPage++;
+        yPosition = marginTop;
+
+       
+        doc.setFontSize(12);
+        doc.text(`Participants List for Event: ${event.title} (Page ${currentPage})`, 10, yPosition);
+        yPosition += 10;
+      }
+
+  
+      doc.setFontSize(10);
+      doc.text(
+        `${index + 1}. Name: ${participant.name}, Email: ${participant.email}, Phone: ${participant.phone}`,
+        10,
+        yPosition,
+      );
+      yPosition += lineSpacing;
+    });
+
+ 
+    const pdfBuffer = doc.output('arraybuffer');
+    response.setHeader('Content-Type', 'application/pdf');
+    response.setHeader('Content-Disposition', `attachment; filename="participants-${eventId}.pdf"`);
+    response.send(Buffer.from(pdfBuffer));
+
+}
 }

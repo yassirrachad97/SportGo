@@ -1,4 +1,6 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Request, Res, UseGuards } from '@nestjs/common';
+import { Response } from 'express';
+
 import { ParticipantsService } from './participants.service';
 import { CreateParticipantDto } from './dto/create-participant.dto';
 import { UpdateParticipantDto } from './dto/Update-ParticipantDto';
@@ -40,6 +42,16 @@ export class ParticipantsController {
     console.log('User ID from request:', req.user?.id);  
 
     return this.participantsService.getParticipantsForEvent(eventId, req.user?.id);  
+  }
+
+  @Get('event/:eventId/pdf')
+  async ImprimerParticipantsPdf(
+    @Param('eventId') eventId: string,
+    @Request() req,
+    @Res() res: Response,
+  ) {
+    const userId = req.user.id; 
+    await this.participantsService.generateParticipantsPdf(eventId, userId, res);
   }
   
 }
