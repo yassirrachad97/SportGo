@@ -7,9 +7,12 @@ import { AuthModule } from 'src/auth/auth.module';
 import { MulterConfigService } from '../config/multer.config';
 import { MulterModule } from '@nestjs/platform-express';
 import { AwsS3Service } from 'src/utils/aws-s3.service';
+import { Participant, ParticipantSchema } from 'src/participants/schema/participant.schema';
 
 @Module({
-  imports: [ MongooseModule.forFeature([{ name: Event.name, schema: EventSchema }]),
+  imports: [ MongooseModule.forFeature([{ name: Event.name, schema: EventSchema },
+    { name: Participant.name, schema: ParticipantSchema }
+  ]),
   AuthModule,
   MulterModule.registerAsync({
     useClass: MulterConfigService,

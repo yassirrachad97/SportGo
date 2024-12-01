@@ -4,11 +4,13 @@ interface CardProps {
   image: string;
   title: string;
   description: string;
-  buttonText: string;
-  buttonColor: string;
+  date: string;
+  location: string;
+  onEdit: () => void;
+  onDelete: () => void;
 }
 
-export function Card({ image, title, description, date }: CardProps) {
+export function Card({ image, title, description, date, location, onEdit, onDelete }: CardProps) {
 
   const formattedDate = new Date(date).toLocaleDateString("fr-FR", {
     weekday: "short",
@@ -29,6 +31,23 @@ export function Card({ image, title, description, date }: CardProps) {
         <h2 className="text-2xl font-bold text-gray-800 mb-3">{title}</h2>
         <p className="text-gray-600 mb-6 line-clamp-3">{description}</p>
         <p className="text-gray-500 text-sm mb-6">{formattedDate}</p> 
+        <p className="text-gray-500 text-sm mb-6">{location}</p> 
+
+
+        <div className="flex justify-between">
+          <button
+            onClick={onEdit} 
+            className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded"
+          >
+            Modifier
+          </button>
+          <button
+            onClick={onDelete} 
+            className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded"
+          >
+            Supprimer
+          </button>
+        </div>
       
       </div>
     </div>

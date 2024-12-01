@@ -38,9 +38,23 @@ export class Event extends Document{
 
 export const EventSchema = SchemaFactory.createForClass(Event);
 
-EventSchema.pre('save', function (next) {
+EventSchema.pre('save', async function (next) {
+
   if (this.isNew && !this.availableSeats) {
     this.availableSeats = this.capacity;
   }
+
+ 
+  if (this.isModified('capacity')) {
+    const participantsCount = await this.model('Participant').countDocuments({ eventId: this._id });
+
+    if (participantsCount === 0) {
+      this.availableSeats = this.capacity;
+    } else {
+     
+      this.availableSeats = this.capacity - participantsCount;
+    }
+  }
+
   next();
 });

@@ -30,15 +30,33 @@ export class EventController {
     }
 
     @Patch(':id')
+    async modifierEvent(
 
-    async modifierEvent(@Param('id') eventId: string, 
-    @Req() req: any, 
-    @Body() updateEventDto: UpdateEventDto,
-){
-    const organizerId = req.user.id;
-    return await this.eventService.updateEvent(eventId, organizerId, updateEventDto);
+      
+      @Param('id') eventId: string,
+      @Req() req: any,
+      @Body() updateEventDto: UpdateEventDto
+    ) {
+ 
+      console.log("ID reçu dans la requête:", eventId);
+    
+     
+      const organizerId = req.user.id;
+      console.log("ID de l'organisateur :", organizerId);
+    
+      console.log("Données reçues dans le corps de la requête:", updateEventDto);
+
+    
+      try {
+        const updatedEvent = await this.eventService.updateEvent(eventId, organizerId, updateEventDto);
+        console.log("Événement mis à jour avec succès:", updatedEvent);
+        return updatedEvent;
+      } catch (error) {
+        console.error("Erreur lors de la mise à jour de l'événement:", error);
+        throw error; 
+      }
     }
-
+    
 
     @Delete('delete/:id')
     async supprimerEvent(@Param('id') eventId: string, @Request() req) {
@@ -49,6 +67,12 @@ export class EventController {
     async getEventsByOrganizer(@Request() req) {
         const organizerId = req.user.id;
         return await this.eventService.getEventsByOrganizer(organizerId);
+      }
+
+
+      @Get(':id')
+      async getEvent(@Param('id') eventId: string) {
+          return await this.eventService.showEvent(eventId);
       }
    
 }
