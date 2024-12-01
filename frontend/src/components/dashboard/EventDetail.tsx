@@ -231,7 +231,6 @@ const EventDetail: React.FC = () => {
         Add Participant
       </button>
 
-      {/* Modal d'ajout de participant */}
       {isModalOpen && (
         <div className="fixed inset-0 flex justify-center items-center bg-gray-600 bg-opacity-50">
           <div className="bg-white p-6 rounded shadow-lg w-96">
@@ -293,7 +292,7 @@ const EventDetail: React.FC = () => {
         </div>
       )}
 
-      {/* Modal de modification de participant */}
+  
       {isEditModalOpen && participantToEdit && (
         <div className="fixed inset-0 flex justify-center items-center bg-gray-600 bg-opacity-50">
           <div className="bg-white p-6 rounded shadow-lg w-96">
