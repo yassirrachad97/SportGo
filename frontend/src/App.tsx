@@ -8,7 +8,8 @@ import Register from './components/auth/Register';
 import DashboardLayout from './components/dashboard/DashboardLayout';
 import AuthGuard from './components/layout/AuthGuard';
 import {Events} from './components/dashboard/Events';
-import Participants from './components/dashboard/Participants';
+import Participants from './components/dashboard/EventDetail';
+import EventDetails from './components/dashboard/EventDetail';
 
 
 
@@ -26,6 +27,8 @@ const App: React.FC = () => {
         <Route path="/dashboard" element={<DashboardLayout />}>
         <Route path="events" element={<Events />} />
         <Route path="participants" element={<Participants />} />
+        <Route path="event/:eventId" element={<EventDetails />} />
+
        
            
 

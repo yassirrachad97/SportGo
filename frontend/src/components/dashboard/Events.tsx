@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Card } from "./Card";
+import { Card } from "./Card";  
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 export function Events() {
   const [cardData, setCardData] = useState<any[]>([]);
@@ -18,6 +19,8 @@ export function Events() {
     capacity: 1,
     image: null,
   });
+
+  const navigate = useNavigate();
 
   const [eventToUpdate, setEventToUpdate] = useState<any | null>(null);
 
@@ -77,6 +80,12 @@ export function Events() {
       setNewEvent({ ...newEvent, [name]: value });
     }
   };
+
+
+  const handleCardClick = (eventId: string) => {
+    navigate(`/dashboard/event/${eventId}`); 
+  };
+  
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files ? e.target.files[0] : null;
@@ -242,20 +251,27 @@ export function Events() {
         </button>
       </div>
 
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {cardData.map((card, index) => (
-          <Card
+          <div
             key={index}
-            image={card.image}
-            title={card.title}
-            description={card.description}
-            location={card.location}
-            date={card.date}
-            onEdit={() => handleEditEvent(card)}
-            onDelete={() => handleDeleteEvent(card._id)}
-          />
+            className="cursor-pointer" 
+            onClick={() => handleCardClick(card._id)} 
+          >
+            <Card
+              image={card.image}
+              title={card.title}
+              description={card.description}
+              location={card.location}
+              date={card.date}
+              onEdit={() => handleEditEvent(card)}
+              onDelete={() => handleDeleteEvent(card._id)}
+            />
+          </div>
         ))}
       </div>
+
 
       <div className="flex justify-between items-center mt-6">
         <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1}>Previous</button>
