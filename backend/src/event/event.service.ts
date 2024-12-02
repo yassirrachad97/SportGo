@@ -56,6 +56,8 @@ export class EventService {
       }
     
       const updateFields: Partial<UpdateEventDto> = {};
+
+      console.log(updateFields);
     
     
     
@@ -95,6 +97,8 @@ export class EventService {
         }
       );
     
+      console.log(updatedEvent);
+      
     
      
     

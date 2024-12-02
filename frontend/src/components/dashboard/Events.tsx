@@ -142,8 +142,6 @@ export function Events() {
       toast.error("Event ID is missing.");
       return;
     }
-
-    console.log("eventToUpdate before sending:", eventToUpdate);
   
     const token = localStorage.getItem("token");
     if (!token) {
@@ -151,29 +149,23 @@ export function Events() {
       return;
     }
   
-    console.log("Event to update:", eventToUpdate);
-  
     const formData = new FormData();
-    formData.append("title", eventToUpdate.title);
-    formData.append("description", eventToUpdate.description);
-    formData.append("location", eventToUpdate.location);
-    formData.append("date", eventToUpdate.date);
-    formData.append("capacity", eventToUpdate.capacity.toString());
+    formData.append("title", eventToUpdate.title || "");
+    formData.append("description", eventToUpdate.description || "");
+    formData.append("location", eventToUpdate.location || "");
+    formData.append("date", new Date(eventToUpdate.date).toISOString() || "");
+    formData.append("capacity", eventToUpdate.capacity?.toString() || "");
   
- 
-    if (eventToUpdate.image && eventToUpdate.image instanceof File) {
-      console.log("New image selected, appending to form data");
-      formData.append("image", eventToUpdate.image);
-    } else if (typeof eventToUpdate.image === "string") {
-      console.log("No new image selected, keeping the existing image:", eventToUpdate.image);
-      formData.append("image", eventToUpdate.image);
+    if (eventToUpdate.image) {
+      if (eventToUpdate.image instanceof File) {
+        console.log("Appending new image to formData");
+        formData.append("image", eventToUpdate.image);
+     
     }
-  
-    console.log("Title before sending:", eventToUpdate.title); 
-
+ 
+  }
   
     try {
-     
       const response = await axios.patch(
         `http://localhost:3000/api/event/${eventToUpdate._id}`,
         formData,
@@ -185,27 +177,21 @@ export function Events() {
         }
       );
   
-      console.log("Response from API:", response.data); 
-  
-      toast.success("Événement mis à jour avec succès.");
-  
-     
-      setCardData((prevData) => {
-        const updatedData = prevData.map((event) =>
+    toast.success('event update with seccess');
+      setCardData((prevData) =>
+        prevData.map((event) =>
           event._id === eventToUpdate._id ? response.data : event
-        );
-        console.log("Updated data in setCardData:", updatedData); 
-        return updatedData;
-      });
-  
-      setIsModalOpen(false); 
-      setEventToUpdate(null); 
-  
+        )
+      );
+      setIsModalOpen(false);
+      setEventToUpdate(null);
     } catch (error) {
       console.error("Update failed:", error);
       toast.error(error?.response?.data?.message || "Échec de la mise à jour.");
     }
   };
+  
+  
   
   
   
@@ -257,7 +243,7 @@ export function Events() {
           <div
             key={index}
             className="cursor-pointer" 
-            onClick={() => handleCardClick(card._id)} 
+       
           >
             <Card
               image={card.image}
@@ -267,6 +253,7 @@ export function Events() {
               date={card.date}
               onEdit={() => handleEditEvent(card)}
               onDelete={() => handleDeleteEvent(card._id)}
+              onclick= {() => handleCardClick(card._id)}
             />
           </div>
         ))}
