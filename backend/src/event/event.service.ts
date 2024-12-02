@@ -58,7 +58,7 @@ export class EventService {
       const updateFields: Partial<UpdateEventDto> = {};
     
     
-      console.log("Received updateEventDto:", updateEventDto);
+    
     
       if (updateEventDto.title) {
         updateFields.title = updateEventDto.title;
@@ -83,7 +83,7 @@ export class EventService {
       }
     
      
-      console.log("Update fields to be sent to database:", updateFields);
+    
     
      
       const updatedEvent = await this.eventModel.findByIdAndUpdate(
@@ -96,7 +96,7 @@ export class EventService {
       );
     
     
-      console.log("Updated Event:", updatedEvent);
+     
     
       return updatedEvent;
     }

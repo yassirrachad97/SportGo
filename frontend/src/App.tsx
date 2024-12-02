@@ -26,7 +26,6 @@ const App: React.FC = () => {
         <Route element={<AuthGuard />}>
         <Route path="/dashboard" element={<DashboardLayout />}>
         <Route path="events" element={<Events />} />
-        <Route path="participants" element={<Participants />} />
         <Route path="event/:eventId" element={<EventDetails />} />
 
        

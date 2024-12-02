@@ -44,7 +44,7 @@ export class ParticipantsService {
         participant: newParticipant,
       };
     } catch (error) {
-      console.error('Error while registering participant:', error);
+      
       throw new BadRequestException('An error occurred while registering the participant.');
     }
   }
@@ -105,7 +105,7 @@ export class ParticipantsService {
 
 
   async getParticipantsForEvent(eventId: string, userId: string): Promise<any> {
-    console.log('Received User ID:', userId);  
+    
 
     if (!eventId || !mongoose.Types.ObjectId.isValid(eventId)) {
         throw new NotFoundException(`L'ID de l'événement ${eventId} est invalide.`);
@@ -135,7 +135,7 @@ export class ParticipantsService {
 
 
 async generateParticipantsPdf(eventId: string, userId: string, response: Response): Promise<void> {
-    console.log('Generating PDF for event:', eventId);
+   
 
     if (!eventId || !mongoose.Types.ObjectId.isValid(eventId)) {
       throw new NotFoundException(`L'ID de l'événement ${eventId} est invalide.`);

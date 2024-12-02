@@ -38,21 +38,21 @@ export class EventController {
       @Body() updateEventDto: UpdateEventDto
     ) {
  
-      console.log("ID reçu dans la requête:", eventId);
+     
     
      
       const organizerId = req.user.id;
-      console.log("ID de l'organisateur :", organizerId);
+     
     
-      console.log("Données reçues dans le corps de la requête:", updateEventDto);
+  
 
     
       try {
         const updatedEvent = await this.eventService.updateEvent(eventId, organizerId, updateEventDto);
-        console.log("Événement mis à jour avec succès:", updatedEvent);
+    
         return updatedEvent;
       } catch (error) {
-        console.error("Erreur lors de la mise à jour de l'événement:", error);
+       
         throw error; 
       }
     }
