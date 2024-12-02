@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card } from "./Card";  
+import { Card } from "./Card";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -25,7 +25,6 @@ export function Events() {
   const [eventToUpdate, setEventToUpdate] = useState<any | null>(null);
 
   const handleEditEvent = (event: any) => {
-    console.log("Editing event:", event); 
     setIsModalOpen(true);
     setEventToUpdate(event);
     setNewEvent({
@@ -48,11 +47,14 @@ export function Events() {
         return;
       }
 
-      const response = await axios.get(`http://localhost:3000/api/event/organizer`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        `http://localhost:3000/api/event/organizer`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (Array.isArray(response.data)) {
         setCardData(response.data);
@@ -63,7 +65,10 @@ export function Events() {
         setCardData([]);
       }
     } catch (error: any) {
-      console.error("Error fetching events:", error?.response?.data || error.message || error);
+      console.error(
+        "Error fetching events:",
+        error?.response?.data || error.message || error
+      );
       setCardData([]);
     }
   };
@@ -72,7 +77,9 @@ export function Events() {
     fetchEvents(currentPage);
   }, [currentPage]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     if (eventToUpdate) {
       setEventToUpdate({ ...eventToUpdate, [name]: value });
@@ -81,21 +88,32 @@ export function Events() {
     }
   };
 
-
   const handleCardClick = (eventId: string) => {
-    navigate(`/dashboard/event/${eventId}`); 
+    navigate(`/dashboard/event/${eventId}`);
   };
-  
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files ? e.target.files[0] : null;
   
-    if (file) {
-    
-      setEventToUpdate({ ...eventToUpdate, image: file });
+    if (eventToUpdate) {
+   
+      if (file) {
+        console.log("Image mise à jour...");
+        setEventToUpdate({ ...eventToUpdate, image: file });
+      } else {
+        console.log("Aucune nouvelle image sélectionnée, conserver l'ancienne image...");
+      
+        setEventToUpdate({ ...eventToUpdate, image: eventToUpdate.image });
+      }
     } else {
-     
-      setEventToUpdate({ ...eventToUpdate, image: eventToUpdate.image });
+   
+      if (file) {
+        console.log("Nouvelle image ajoutée...");
+        setNewEvent({ ...newEvent, image: file });
+      } else {
+        console.log("Aucune image sélectionnée, image à null...");
+        setNewEvent({ ...newEvent, image: null });
+      }
     }
   };
   
@@ -114,14 +132,18 @@ export function Events() {
         formData.append("image", newEvent.image);
       }
 
-      const response = await axios.post("http://localhost:3000/api/event/create", formData, {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await axios.post(
+        "http://localhost:3000/api/event/create",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
 
-      toast.success(response.data.message);
+      toast.success("event add with seccess");
       setCardData([...cardData, response.data]);
       setIsModalOpen(false);
       setNewEvent({
@@ -133,7 +155,9 @@ export function Events() {
         image: null,
       });
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || "An unexpected error occurred.");
+      toast.error(
+        error?.response?.data?.message || "An unexpected error occurred."
+      );
     }
   };
 
@@ -142,29 +166,27 @@ export function Events() {
       toast.error("Event ID is missing.");
       return;
     }
-  
+
     const token = localStorage.getItem("token");
     if (!token) {
       toast.error("Token not found.");
       return;
     }
-  
+
     const formData = new FormData();
     formData.append("title", eventToUpdate.title || "");
     formData.append("description", eventToUpdate.description || "");
     formData.append("location", eventToUpdate.location || "");
     formData.append("date", new Date(eventToUpdate.date).toISOString() || "");
     formData.append("capacity", eventToUpdate.capacity?.toString() || "");
-  
+
     if (eventToUpdate.image) {
       if (eventToUpdate.image instanceof File) {
         console.log("Appending new image to formData");
         formData.append("image", eventToUpdate.image);
-     
+      }
     }
- 
-  }
-  
+
     try {
       const response = await axios.patch(
         `http://localhost:3000/api/event/${eventToUpdate._id}`,
@@ -176,8 +198,8 @@ export function Events() {
           },
         }
       );
-  
-    toast.success('event update with seccess');
+
+      toast.success("event update with seccess");
       setCardData((prevData) =>
         prevData.map((event) =>
           event._id === eventToUpdate._id ? response.data : event
@@ -190,16 +212,8 @@ export function Events() {
       toast.error(error?.response?.data?.message || "Échec de la mise à jour.");
     }
   };
-  
-  
-  
-  
-  
-  
-  
 
   const handleDeleteEvent = async (id: string) => {
-
     if (!id) {
       toast.error("Event ID is missing.");
       return;
@@ -213,11 +227,14 @@ export function Events() {
         return;
       }
 
-      const response = await axios.delete(`http://localhost:3000/api/event/delete/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.delete(
+        `http://localhost:3000/api/event/delete/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       toast.success("Event deleted successfully.");
       setCardData((prevData) => prevData.filter((event) => event._id !== id));
@@ -230,21 +247,27 @@ export function Events() {
     <div className="p-6 bg-gray-50 flex-1">
       <div className="flex justify-end mb-4">
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setIsModalOpen(true);
+            setEventToUpdate(null);
+            setNewEvent({
+              title: "",
+              description: "",
+              location: "",
+              date: "",
+              capacity: 1,
+              image: null,
+            });
+          }}
           className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded shadow"
         >
           Add Event
         </button>
       </div>
 
-      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {cardData.map((card, index) => (
-          <div
-            key={index}
-            className="cursor-pointer" 
-       
-          >
+          <div key={index} className="cursor-pointer">
             <Card
               image={card.image}
               title={card.title}
@@ -253,26 +276,41 @@ export function Events() {
               date={card.date}
               onEdit={() => handleEditEvent(card)}
               onDelete={() => handleDeleteEvent(card._id)}
-              onclick= {() => handleCardClick(card._id)}
+              onclick={() => handleCardClick(card._id)}
             />
           </div>
         ))}
       </div>
 
-
       <div className="flex justify-between items-center mt-6">
-        <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1}>Previous</button>
-        <span>Page {currentPage} of {totalPages}</span>
-        <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === totalPages}>Next</button>
+        <button
+          onClick={() => setCurrentPage(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+        <span>
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          onClick={() => setCurrentPage(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          Next
+        </button>
       </div>
 
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded shadow-lg w-96">
-            <h2 className="text-xl font-bold mb-4">{eventToUpdate ? 'Update Event' : 'Add Event'}</h2>
+            <h2 className="text-xl font-bold mb-4">
+              {eventToUpdate ? "Update Event" : "Add Event"}
+            </h2>
 
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Title</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Title
+              </label>
               <input
                 type="text"
                 name="title"
@@ -282,26 +320,38 @@ export function Events() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Description</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Description
+              </label>
               <textarea
                 name="description"
-                value={eventToUpdate ? eventToUpdate.description : newEvent.description}
+                value={
+                  eventToUpdate
+                    ? eventToUpdate.description
+                    : newEvent.description
+                }
                 onChange={handleInputChange}
                 className="w-full px-4 py-2 border rounded"
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Location</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Location
+              </label>
               <input
                 type="text"
                 name="location"
-                value={eventToUpdate ? eventToUpdate.location : newEvent.location}
+                value={
+                  eventToUpdate ? eventToUpdate.location : newEvent.location
+                }
                 onChange={handleInputChange}
                 className="w-full px-4 py-2 border rounded"
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Date</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Date
+              </label>
               <input
                 type="date"
                 name="date"
@@ -311,17 +361,23 @@ export function Events() {
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Capacity</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Capacity
+              </label>
               <input
                 type="number"
                 name="capacity"
-                value={eventToUpdate ? eventToUpdate.capacity : newEvent.capacity}
+                value={
+                  eventToUpdate ? eventToUpdate.capacity : newEvent.capacity
+                }
                 onChange={handleInputChange}
                 className="w-full px-4 py-2 border rounded"
               />
             </div>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Image</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Image
+              </label>
               <input
                 type="file"
                 onChange={handleFileChange}
@@ -334,7 +390,7 @@ export function Events() {
                 onClick={eventToUpdate ? handleUpdateEvent : handleAddEvent}
                 className="px-4 py-2 bg-blue-500 text-white rounded shadow"
               >
-                {eventToUpdate ? 'Update' : 'Add'} Event
+                {eventToUpdate ? "Update" : "Add"} Event
               </button>
               <button
                 onClick={() => setIsModalOpen(false)}
