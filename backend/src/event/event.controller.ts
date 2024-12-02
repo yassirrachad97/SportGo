@@ -48,6 +48,8 @@ export class EventController {
     @Get('organizer')
     async getEventsByOrganizer(@Request() req) {
         const organizerId = req.user.id;
+
+        
         return await this.eventService.getEventsByOrganizer(organizerId);
       }
    
