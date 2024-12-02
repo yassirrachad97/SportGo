@@ -196,6 +196,40 @@ const EventDetail: React.FC = () => {
     setCurrentPage(page);
   };
 
+
+  const handleDownloadPdf = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Vous devez être connecté pour télécharger le PDF.");
+        return;
+      }
+
+  
+      const response = await axios.get(
+        `http://localhost:3000/api/participants/event/${eventId}/pdf`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          responseType: "blob", 
+        }
+      );
+
+      
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `participants-${eventId}.pdf`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      toast.error("Échec de la génération du PDF. Veuillez réessayer.");
+      console.error("Erreur lors du téléchargement du PDF :", error);
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -210,6 +244,12 @@ const EventDetail: React.FC = () => {
 
   return (
     <div className="event-detail p-4">
+       <button
+        onClick={handleDownloadPdf}
+        className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
+      >
+        Imprimer PDF
+      </button>
       <h2 className="text-2xl font-bold mb-4">{eventDetail.title}</h2>
       <p>{eventDetail.description}</p>
       <p>
@@ -417,6 +457,8 @@ const EventDetail: React.FC = () => {
             className={`px-3 py-1 rounded ${currentPage === index + 1 ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"}`}
           >
             {index + 1}
+
+
           </button>
         ))}
       </div>

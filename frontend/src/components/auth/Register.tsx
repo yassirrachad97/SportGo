@@ -78,7 +78,7 @@ const Register: React.FC = () => {
                 setUsername('');
                 setEmail('');
                 setPassword('');
-                navigate('/login');
+                navigate('/');
 
              
           
@@ -134,7 +134,7 @@ const Register: React.FC = () => {
                 
                 <div className="register-link">
                     <p>
-                        Already have an account? <Link to="/login">Login</Link>
+                        Already have an account? <Link to="/">Login</Link>
                     </p>
                 </div>
             </div>

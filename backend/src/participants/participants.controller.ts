@@ -39,7 +39,7 @@ export class ParticipantsController {
     @Param('eventId') eventId: string,
     @Request() req, 
   ): Promise<any> {
-    console.log('User ID from request:', req.user?.id);  
+   
 
     return this.participantsService.getParticipantsForEvent(eventId, req.user?.id);  
   }

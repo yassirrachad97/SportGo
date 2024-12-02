@@ -1,0 +1,25 @@
+# Ignorer node_modules pour éviter des conflits ou la duplication
+node_modules
+
+# Ignorer les fichiers de configuration ou sensibles
+.env
+*.log
+
+# Ignorer les fichiers de build et autres fichiers inutiles pour Docker
+dist
+build
+coverage
+
+# Ignorer les fichiers spécifiques à l'éditeur
+.vscode
+.idea
+*.iml
+
+# Ignorer les fichiers système
+.DS_Store
+Thumbs.db
+*.swp
+
+# Ignorer les dépôts git locaux
+.git
+.gitignore

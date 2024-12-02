@@ -8,9 +8,10 @@ interface CardProps {
   location: string;
   onEdit: () => void;
   onDelete: () => void;
+  onclick: () => void;
 }
 
-export function Card({ image, title, description, date, location, onEdit, onDelete }: CardProps) {
+export function Card({ image, title, description, date, location, onEdit, onDelete, onclick }: CardProps) {
 
   const formattedDate = new Date(date).toLocaleDateString("fr-FR", {
     weekday: "short",
@@ -28,7 +29,7 @@ export function Card({ image, title, description, date, location, onEdit, onDele
         />
       </div>
       <div className="p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-3">{title}</h2>
+        <h2 onClick={onclick} className="text-2xl font-bold text-gray-800 mb-3">{title}</h2>
         <p className="text-gray-600 mb-6 line-clamp-3">{description}</p>
         <p className="text-gray-500 text-sm mb-6">{formattedDate}</p> 
         <p className="text-gray-500 text-sm mb-6">{location}</p> 
